@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import GameArena from './GameArena';
+import { supabase } from './utils/supabaseClient';
 import './global.css';
 
 export default function App() {
@@ -10,6 +11,7 @@ export default function App() {
   
   // 1. Add the isHost state
   const [isHost, setIsHost] = useState(false); 
+  const [isJoining, setIsJoining] = useState(false);
 
   const generateRoomCode = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -28,11 +30,36 @@ export default function App() {
     setInGame(true);
   };
 
-  const handleJoinGame = () => {
+  const handleJoinGame = async () => {
     if (!playerName.trim()) return alert("Please enter a name first!");
     if (!roomCode.trim() || roomCode.length !== 5) return alert("Please enter a valid 5-letter room code!");
-    setIsHost(false); // 3. Joiner is the Guest
-    setInGame(true);
+
+    setIsJoining(true); // 3. Start the loading animation
+
+    const checkRoom = supabase.channel(`room_${roomCode.toUpperCase()}`);
+    let isLobbyActive = false;
+
+    checkRoom.on('broadcast', { event: 'sync_format' }, () => {
+      isLobbyActive = true;
+    });
+
+    checkRoom.subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        await checkRoom.send({ type: 'broadcast', event: 'guest_joined', payload: {} });
+
+        setTimeout(() => {
+          supabase.removeChannel(checkRoom); 
+          setIsJoining(false); // 4. Stop the loading animation
+
+          if (isLobbyActive) {
+            setIsHost(false);
+            setInGame(true); 
+          } else {
+            alert("Lobby not found! Make sure the host is currently in the room.");
+          }
+        }, 1500);
+      }
+    });
   };
 
   if (inGame) {
@@ -91,8 +118,12 @@ export default function App() {
             onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
             maxLength={5}
           />
-          <button className="secondary-button" onClick={handleJoinGame}>
-            Join Game
+          <button 
+            className={`secondary-button ${isJoining ? 'loading-button' : ''}`} 
+            onClick={handleJoinGame}
+            disabled={isJoining}
+          >
+            {isJoining ? <span className="spinner"></span> : "Join Game"}
           </button>
         </div>
       </div>

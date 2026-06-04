@@ -316,19 +316,7 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
       
       {/* FLOATING REMATCH NOTIFICATION */}
       {opponentRematchReady && !imRematchReady && phase === 'gameover' && (
-        <div style={{
-          position: 'absolute',
-          top: '20%',
-          left: '50%',
-          transform: 'translate(-50%, 0)',
-          backgroundColor: 'var(--accent)',
-          color: '#fff',
-          padding: '10px 20px',
-          borderRadius: '20px',
-          fontWeight: 'bold',
-          zIndex: 50,
-          boxShadow: 'var(--box-shadow)',
-        }}>
+        <div className="rematch-notification">
           Opponent requested a rematch!
         </div>
       )}
@@ -337,7 +325,7 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
       <div className="header" style={{ alignItems: 'center', position: 'relative', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <p onClick={() => setShowCode(!showCode)} style={{ cursor: 'pointer', userSelect: 'none', margin: 0, padding: '5px' }} title="Click to reveal/hide room code">
-            Room Code: <strong style={{ display: 'inline-block', width: '60px', textAlign: 'center', letterSpacing: showCode ? '1px' : '3px' }}>
+            Room Code: <strong style={{ display: 'inline-block', width: '60px', textAlign: 'center', letterSpacing: showCode ? '1px' : '3px', paddingRight: '10px' }}>
               {showCode ? roomCode : '•••••'}
             </strong> 
             <span style={{fontSize: '1rem', color: 'var(--label-text)'}}>&#128065;</span>
@@ -366,24 +354,11 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
           </button>
 
           {showMenu && (
-            <div style={{ 
-              position: 'absolute', 
-              top: '60px', 
-              right: '20px', 
-              backgroundColor: 'var(--card-bg)', 
-              border: '1px solid var(--input-border)', 
-              borderRadius: '8px', 
-              padding: '10px', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              gap: '10px', 
-              zIndex: 100, 
-              boxShadow: 'var(--box-shadow)' 
-            }}>
-              <button style={{ background: 'transparent', color: 'var(--main-text)', border: 'none', padding: '10px', cursor: 'pointer', textAlign: 'left', opacity: 0.5 }}>Leaderboard (Soon)</button>
-              <button style={{ background: 'transparent', color: 'var(--main-text)', border: 'none', padding: '10px', cursor: 'pointer', textAlign: 'left', opacity: 0.5 }}>Account (Soon)</button>
-              <hr style={{ border: '0', height: '1px', backgroundColor: 'var(--input-border)', margin: '5px 0' }} />
-              <button onClick={handleForfeit} style={{ background: 'var(--loss)', color: '#fff', border: 'none', padding: '10px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+            <div className="menu-dropdown">
+              <button className="disabled-link">Leaderboard (Soon)</button>
+              <button className="disabled-link">Account (Soon)</button>
+              <hr className="divider" style={{ margin: '5px 0' }} />
+              <button className="leave-match" onClick={handleForfeit}>
                 Leave Match
               </button>
             </div>
