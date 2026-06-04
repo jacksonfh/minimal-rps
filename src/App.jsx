@@ -1,5 +1,4 @@
 import { useState } from 'react';
-
 import GameArena from './GameArena';
 import './global.css';
 
@@ -7,9 +6,11 @@ export default function App() {
   const [inGame, setInGame] = useState(false);
   const [playerName, setPlayerName] = useState('');
   const [roomCode, setRoomCode] = useState('');
-  const [format, setFormat] = useState(3); // Default Best of 3
+  const [format, setFormat] = useState(3);
+  
+  // 1. Add the isHost state
+  const [isHost, setIsHost] = useState(false); 
 
-  // Helper to generate a random 5-letter room code
   const generateRoomCode = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     let code = '';
@@ -23,28 +24,28 @@ export default function App() {
     if (!playerName.trim()) return alert("Please enter a name first!");
     const newCode = generateRoomCode();
     setRoomCode(newCode);
+    setIsHost(true); // 2. Creator is the Host
     setInGame(true);
   };
 
   const handleJoinGame = () => {
     if (!playerName.trim()) return alert("Please enter a name first!");
     if (!roomCode.trim() || roomCode.length !== 5) return alert("Please enter a valid 5-letter room code!");
+    setIsHost(false); // 3. Joiner is the Guest
     setInGame(true);
   };
 
-  // If the user has joined a game, render the GameArena.
-  // Otherwise, render the Lobby.
   if (inGame) {
     return (
       <GameArena 
         roomCode={roomCode.toUpperCase()} 
         myName={playerName} 
-        format={format} 
+        initialFormat={format} // 4. Rename to initialFormat
+        isHost={isHost}        // 5. Pass the Host status
       />
     );
   }
 
-  // --- LOBBY UI ---
   return (
     <div className="container">
       <h1 className="title">Minimal RPS</h1>
@@ -61,7 +62,6 @@ export default function App() {
 
         <hr className="divider" />
 
-        {/* CREATE GAME SECTION */}
         <div className="section">
           <label className="label">Match Format:</label>
           <select 
@@ -69,6 +69,8 @@ export default function App() {
             value={format} 
             onChange={(e) => setFormat(Number(e.target.value))}
           >
+            {/* Added Best of 1 here! */}
+            <option value={1}>Best of 1</option>
             <option value={3}>Best of 3</option>
             <option value={5}>Best of 5</option>
             <option value={7}>Best of 7</option>
@@ -80,7 +82,6 @@ export default function App() {
 
         <hr className="divider" />
 
-        {/* JOIN GAME SECTION */}
         <div className="section">
           <input 
             className="input"
