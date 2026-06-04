@@ -218,10 +218,11 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
     return () => supabase.removeChannel(room);
   }, [roomCode, myName, isHost, currentFormat, winsNeeded, saveMatchHistory]);
 
+  // Restored 30 seconds
   useEffect(() => {
     if (phase === 'waiting' && imReady && opponentReady) {
       setPhase('picking');
-      setTimeLeft(10);
+      setTimeLeft(30); 
     }
   }, [imReady, opponentReady, phase]);
 
@@ -232,16 +233,30 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
     }
   }, [myChoice, opponentChoice, phase]);
 
+  // --- NEW: Robust Timer ---
+  // Continuously ticks down while in the picking phase
   useEffect(() => {
     if (phase === 'picking') {
-      if (timeLeft > 0) {
-        const t = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-        return () => clearTimeout(t);
-      } else {
-        if (!myChoice) handleChoice('timeout');
+      const t = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
+      return () => clearTimeout(t);
+    }
+  }, [phase, timeLeft]);
+
+  // Checks time limits and forces action if someone disconnects
+  useEffect(() => {
+    if (phase === 'picking') {
+      // Normal timeout for you
+      if (timeLeft === 0 && !myChoice) {
+        handleChoice('timeout');
+      }
+      // Dead man's switch: If it's been 3 seconds past 0 and the opponent still 
+      // hasn't responded (due to lag or locking their phone), force them to timeout.
+      if (timeLeft <= -3 && !opponentChoice) {
+        setOpponentChoice('timeout');
       }
     }
-  }, [phase, timeLeft, myChoice, handleChoice]);
+  }, [phase, timeLeft, myChoice, opponentChoice, handleChoice]);
+  // -------------------------
 
   useEffect(() => {
     if (phase === 'reveal') {
@@ -254,13 +269,14 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
     }
   }, [phase, revealTime, calculateWinner]);
 
+  // Restored 30 seconds
   useEffect(() => {
     if (phase === 'result') {
       const t = setTimeout(() => {
         setMyChoice(null);
         setOpponentChoice(null);
         setPhase('picking');
-        setTimeLeft(10);
+        setTimeLeft(30); 
       }, 3000);
       return () => clearTimeout(t);
     }
@@ -345,7 +361,10 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
 
         <div className="center-area">
           {phase === 'waiting' && <p style={{ color: 'var(--label-text)' }}>Waiting for players to ready up...</p>}
-          {phase === 'picking' && <h1 style={{ fontSize: 'clamp(2.5rem, 6vh, 4rem)', margin: 0 }}>{timeLeft}</h1>}
+          
+          {/* Math.max prevents the user from seeing the internal -3 second grace period */}
+          {phase === 'picking' && <h1 style={{ fontSize: 'clamp(2.5rem, 6vh, 4rem)', margin: 0 }}>{Math.max(0, timeLeft)}</h1>}
+          
           {phase === 'reveal' && <h1 style={{ fontSize: 'clamp(2rem, 5vh, 3rem)', margin: 0 }}>Revealing in {revealTime}...</h1>}
           {(phase === 'result' || phase === 'gameover') && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
