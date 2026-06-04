@@ -4,18 +4,27 @@ html {
     padding: 0;
     background-color: #121212;
     font-family: 'Inter', sans-serif;
+    /* Stops pull to refresh rubber band bounce on mobile*/
+    overscroll-behavior: none;
+    /* Locks the body from scrolling entirely */
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
 }
 
 /* --- Shared/Layout --- */
 .container {
     color: #ffffff;
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 20px;
     box-sizing: border-box;
+
+    overflow: hidden;
 }
 
 /* --- Lobby Styles --- */
@@ -165,4 +174,9 @@ html {
 
 .play-button:hover {
     background-color: #9d4edd;
+}
+
+/* prevent double-tap zooming on mobile */
+button {
+    touch-action: manipulation;
 }
