@@ -21,21 +21,21 @@ html {
     padding: 0;
     background-color: var(--main-bg);
     font-family: 'Inter', sans-serif;
-    overscroll-behavior: none; /* Stops rubber-band bouncing */
-    overflow: hidden; /* Strictly lock the screen from scrolling */
+    overscroll-behavior: none; 
+    overflow: hidden; /* Strictly locks the screen from scrolling */
     width: 100%;
-    height: 100dvh; /* Force exact device screen height */
+    height: 100dvh; /* Forces exact device screen height */
 }
 
 /* --- Shared/Layout --- */
 .container {
     color: var(--main-text);
-    height: 100%; /* Fill the locked body perfectly */
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: clamp(10px, 2vh, 20px); 
+    padding: clamp(10px, 2vh, 20px);
     box-sizing: border-box;
 }
 
@@ -44,32 +44,23 @@ html {
     border-radius: 12px;
     width: 100%;
     max-width: 400px;
-    max-height: 100%; /* Prevent card from growing taller than the screen */
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly; /* Evenly distribute available space */
-    padding: clamp(15px, 4vh, 30px); /* Padding dynamically shrinks on short screens */
+    padding: clamp(15px, 3vh, 30px);
     box-sizing: border-box;
 }
 
-.section {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(8px, 2vh, 15px); /* Space between inputs/buttons shrinks dynamically */
-    margin: 0; /* Remove any hardcoded margins causing overflow */
-}
-
-.divider {
+/* --- Restored Input Stylings --- */
+.input, .select {
+    background-color: var(--input-bg);
+    color: var(--main-text);
+    border: 1px solid var(--input-border);
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
     width: 100%;
-    border: none;
-    border-top: 1px solid var(--input-border);
-    margin: clamp(10px, 3vh, 20px) 0; /* Divider spacing shrinks dynamically */
-}
-
-/* Ensure inputs and buttons don't stay excessively tall */
-.input, .select, .primary-button, .secondary-button {
-    min-height: 40px; 
-    height: clamp(40px, 6vh, 50px);
+    box-sizing: border-box;
 }
 
 .section {
@@ -83,9 +74,7 @@ html {
     color: var(--label-text);
 }
 
-.primary-button {
-    background-color: var(--accent);
-    color: var(--main-text);
+.primary-button, .secondary-button {
     border: none;
     padding: 14px;
     border-radius: 6px;
@@ -93,33 +82,46 @@ html {
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.1s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.primary-button {
+    background-color: var(--accent);
+    color: var(--main-text);
 }
 
 .secondary-button {
     background-color: var(--input-border);
     color: var(--main-text);
+}
+
+.primary-button:active, .secondary-button:active {
+    transform: scale(0.95);
+}
+
+.primary-button:disabled, .secondary-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.divider {
+    width: 100%;
     border: none;
-    padding: 14px;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.1s ease;
+    border-top: 1px solid var(--input-border);
+    margin: clamp(10px, 2vh, 20px) 0;
 }
 
-.primary-button:active,
-.secondary-button:active {
-    transform: scale(0.98);
-}
-
-/* --- Game Arena Styles --- */
-.header {
+/* --- Arena Refactored to Fit Viewport --- */
+.arena-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     background-color: var(--card-bg);
-    padding: 15px 20px;
+    padding: clamp(8px, 1.5vh, 15px) 20px;
     border-radius: 8px;
-    margin-bottom: 20px;
+    margin-bottom: clamp(10px, 2vh, 20px);
     color: var(--label-text);
     width: 100%;
     max-width: 600px;
@@ -130,76 +132,54 @@ html {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: space-evenly; /* Dynamically evenly spaces children */
     align-items: center;
     background-color: var(--arena-bg);
     border-radius: 12px;
-    padding: 40px 20px;
+    padding: clamp(10px, 2vh, 30px) 20px;
     width: 100%;
     max-width: 600px;
+    max-height: 80dvh; /* Hard cap prevents blowing past the screen */
     box-sizing: border-box;
 }
 
 .center-area {
-    height: 150px;
+    height: clamp(60px, 12vh, 150px);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .vs {
-    font-size: 3rem;
+    font-size: clamp(1.8rem, 4vh, 3rem);
     color: var(--input-border);
     margin: 0;
 }
 
 .player-text {
-    font-size: 1.5rem;
+    font-size: clamp(1.1rem, 2.5vh, 1.5rem);
     margin: 0;
+}
+
+.play-button {
+    font-size: clamp(1.8rem, 4vh, 3rem);
+    padding: clamp(10px, 2vh, 20px);
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .controls {
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
+    gap: clamp(10px, 2vw, 20px);
     width: 100%;
-    max-width: 600px;
 }
 
-.play-button {
-    flex: 1;
-    padding: 20px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    background-color: var(--accent);
-    color: var(--main-text);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.play-button:hover {
-    background-color: var(--button-bg);
-}
-
-/* prevent double-tap zooming on mobile */
-button {
-    touch-action: manipulation;
-}
-
-.notches {
-    display: 'flex';
-    gap: '8px';
-    justify-content: 'center';
-    margin-top: '5px';
-}
-
-/* --- Loading Animations --- */
+/* --- Utilities & Dropdowns --- */
 .loading-button {
-    opacity: 0.7;
-    cursor: not-allowed;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -219,7 +199,6 @@ button {
     to { transform: rotate(360deg); }
 }
 
-/* --- GameArena Refactored Classes --- */
 .rematch-notification {
     position: absolute;
     top: 20%;
@@ -266,7 +245,6 @@ button {
     background-color: var(--loss);
     border-radius: 4px;
     font-weight: bold;
-    opacity: 1;
 }
 
 .header-controls {

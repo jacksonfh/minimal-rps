@@ -9,7 +9,6 @@ export default function App() {
   const [roomCode, setRoomCode] = useState('');
   const [format, setFormat] = useState(3);
   
-  // 1. Add the isHost state
   const [isHost, setIsHost] = useState(false); 
   const [isJoining, setIsJoining] = useState(false);
 
@@ -26,7 +25,7 @@ export default function App() {
     if (!playerName.trim()) return alert("Please enter a name first!");
     const newCode = generateRoomCode();
     setRoomCode(newCode);
-    setIsHost(true); // 2. Creator is the Host
+    setIsHost(true);
     setInGame(true);
   };
 
@@ -34,7 +33,7 @@ export default function App() {
     if (!playerName.trim()) return alert("Please enter a name first!");
     if (!roomCode.trim() || roomCode.length !== 5) return alert("Please enter a valid 5-letter room code!");
 
-    setIsJoining(true); // 3. Start the loading animation
+    setIsJoining(true);
 
     const checkRoom = supabase.channel(`room_${roomCode.toUpperCase()}`);
     let isLobbyActive = false;
@@ -49,7 +48,7 @@ export default function App() {
 
         setTimeout(() => {
           supabase.removeChannel(checkRoom); 
-          setIsJoining(false); // 4. Stop the loading animation
+          setIsJoining(false);
 
           if (isLobbyActive) {
             setIsHost(false);
@@ -65,17 +64,17 @@ export default function App() {
   if (inGame) {
     return (
       <GameArena 
-        roomCode={roomCode.toUpperCase()} 
+        roomCode={roomCode} 
         myName={playerName} 
-        initialFormat={format} // 4. Rename to initialFormat
-        isHost={isHost}        // 5. Pass the Host status
+        initialFormat={format} 
+        isHost={isHost} 
       />
     );
   }
 
   return (
     <div className="container">
-      <h1 className="title">Minimal RPS</h1>
+      <h1 className="title" style={{ fontSize: '2.5rem', marginBottom: '20px' }}>Minimal RPS</h1>
       
       <div className="card">
         <input 
@@ -96,7 +95,6 @@ export default function App() {
             value={format} 
             onChange={(e) => setFormat(Number(e.target.value))}
           >
-            {/* Added Best of 1 here! */}
             <option value={1}>Best of 1</option>
             <option value={3}>Best of 3</option>
             <option value={5}>Best of 5</option>
