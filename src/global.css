@@ -21,63 +21,55 @@ html {
     padding: 0;
     background-color: var(--main-bg);
     font-family: 'Inter', sans-serif;
-    /* Stops pull to refresh rubber band bounce on mobile*/
-    overscroll-behavior: none;
-    /* Locks the body from scrolling entirely */
-    overflow: hidden;
+    overscroll-behavior: none; /* Stops rubber-band bouncing */
+    overflow: hidden; /* Strictly lock the screen from scrolling */
     width: 100%;
-    min-height: 100dvh;
+    height: 100dvh; /* Force exact device screen height */
 }
 
 /* --- Shared/Layout --- */
 .container {
     color: var(--main-text);
-    min-height: 100dvh;
+    height: 100%; /* Fill the locked body perfectly */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: clamp(10px, 2vh, 20px); 
     box-sizing: border-box;
-
-    overflow-y: auto;
-}
-
-/* --- Lobby Styles --- */
-.title {
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-    letter-spacing: -1px;
 }
 
 .card {
     background-color: var(--card-bg);
-    padding: 30px;
     border-radius: 12px;
     width: 100%;
     max-width: 400px;
-    box-shadow: var(--box-shadow);
+    max-height: 100%; /* Prevent card from growing taller than the screen */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly; /* Evenly distribute available space */
+    padding: clamp(15px, 4vh, 30px); /* Padding dynamically shrinks on short screens */
     box-sizing: border-box;
 }
 
-.input,
-.select {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 6px;
-    border: 1px solid var(--input-border);
-    background-color: var(--input-bg);
-    color: var(--main-text);
-    font-size: 1rem;
-    box-sizing: border-box;
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 2vh, 15px); /* Space between inputs/buttons shrinks dynamically */
+    margin: 0; /* Remove any hardcoded margins causing overflow */
 }
 
 .divider {
-    border: 0;
-    height: 1px;
-    background-color: var(--input-border);
-    margin: 20px 0;
+    width: 100%;
+    border: none;
+    border-top: 1px solid var(--input-border);
+    margin: clamp(10px, 3vh, 20px) 0; /* Divider spacing shrinks dynamically */
+}
+
+/* Ensure inputs and buttons don't stay excessively tall */
+.input, .select, .primary-button, .secondary-button {
+    min-height: 40px; 
+    height: clamp(40px, 6vh, 50px);
 }
 
 .section {
