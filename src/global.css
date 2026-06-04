@@ -1,0 +1,168 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- Shared/Layout --- */
+.container {
+    color: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* --- Lobby Styles --- */
+.title {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    letter-spacing: -1px;
+}
+
+.card {
+    background-color: #1e1e1e;
+    padding: 30px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    box-sizing: border-box;
+}
+
+.input,
+.select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background-color: #2a2a2a;
+    color: #fff;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.divider {
+    border: 0;
+    height: 1px;
+    background-color: #333;
+    margin: 20px 0;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.label {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.primary-button {
+    background-color: #8a2be2;
+    color: #fff;
+    border: none;
+    padding: 14px;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.secondary-button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 14px;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.primary-button:active,
+.secondary-button:active {
+    transform: scale(0.98);
+}
+
+/* --- Game Arena Styles --- */
+.header {
+    display: flex;
+    justify-content: space-between;
+    background-color: #1e1e1e;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    color: #aaa;
+    width: 100%;
+    max-width: 600px;
+    box-sizing: border-box;
+}
+
+.arena {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    padding: 40px 20px;
+    width: 100%;
+    max-width: 600px;
+    box-sizing: border-box;
+}
+
+.center-area {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vs {
+    font-size: 3rem;
+    color: #333;
+    margin: 0;
+}
+
+.player-text {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.play-button {
+    flex: 1;
+    padding: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background-color: #8a2be2;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.play-button:hover {
+    background-color: #9d4edd;
+}
