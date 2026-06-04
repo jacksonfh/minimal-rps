@@ -203,3 +203,82 @@ button {
     justify-content: 'center';
     margin-top: '5px';
 }
+
+/* --- Loading Animations --- */
+.loading-button {
+    opacity: 0.7;
+    cursor: not-allowed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--main-text);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --- GameArena Refactored Classes --- */
+.rematch-notification {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: var(--accent);
+    color: var(--main-text);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    z-index: 50;
+    box-shadow: var(--box-shadow);
+}
+
+.menu-dropdown {
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+    box-shadow: var(--box-shadow);
+}
+
+.menu-dropdown button {
+    background: transparent;
+    color: var(--main-text);
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.menu-dropdown button.disabled-link {
+    opacity: 0.5;
+}
+
+.menu-dropdown button.leave-match {
+    background-color: var(--loss);
+    border-radius: 4px;
+    font-weight: bold;
+    opacity: 1;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
