@@ -282,8 +282,11 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
 
   useEffect(() => {
     if (phase === 'picking' && myChoice && opponentChoice) {
-      setPhase('reveal');
-      setRevealTime(4);
+      const asyncTimer = setTimeout(() => {
+        setPhase('reveal');
+        setRevealTime(4);
+      }, 0);
+      return () => clearTimeout(asyncTimer);
     }
   }, [myChoice, opponentChoice, phase]);
 
@@ -296,8 +299,12 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
 
   useEffect(() => {
     if (phase === 'picking') {
-      if (timeLeft === 0 && !myChoice) handleChoice('timeout');
-      if (timeLeft <= -3 && !opponentChoice) setOpponentChoice('timeout');
+      const asyncTimer = setTimeout(() => {
+        if (timeLeft === 0 && !myChoice) handleChoice('timeout');
+        if (timeLeft <= -3 && !opponentChoice) setOpponentChoice('timeout');
+      }, 0);
+      
+      return () => clearTimeout(asyncTimer);
     }
   }, [phase, timeLeft, myChoice, opponentChoice, handleChoice]);
 
@@ -307,7 +314,10 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
         const t = setTimeout(() => setRevealTime(revealTime - 1), 700);
         return () => clearTimeout(t);
       } else {
-        calculateWinner();
+        const asyncTimer = setTimeout(() => {
+          calculateWinner();
+        }, 0);
+        return () => clearTimeout(asyncTimer);
       }
     }
   }, [phase, revealTime, calculateWinner]);
