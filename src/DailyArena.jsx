@@ -114,9 +114,10 @@ export default function DailyArena({ myName }) {
       </div>
 
       <div className="arena">
+        
         {/* TOP: GLOBAL OPPONENT */}
         <div className="player-area">
-          <div className="player-block-top">
+          <div className="player-info">
             <h2 className="player-text">RPSdle:</h2>
             <p className="score-text">Score: {opponentScore}</p>
           </div>
@@ -127,7 +128,7 @@ export default function DailyArena({ myName }) {
             </span>
           </div>
           
-          <p className="status-text"></p>
+          <p className="status-text" style={{ marginBottom: '30px' }}></p>
 
           <div className="history-top">
             {renderHistoryTrail(opponentHistory, matchHistory, format)}
@@ -161,7 +162,7 @@ export default function DailyArena({ myName }) {
             {renderHistoryTrail(myHistory, matchHistory, format)}
           </div>
 
-          <p className="status-text"></p>
+          <p className="status-text" style={{ marginTop: '30px' }}></p>
 
           <div className="choice-container">
             {phase === 'picking' && !myChoice ? (
@@ -174,11 +175,13 @@ export default function DailyArena({ myName }) {
               <span className="choice-emoji">{myChoice ? getEmoji(myChoice) : ''}</span>
             )}
           </div>
-          <div className="player-block-bottom">
+          
+          <div className="player-info">
             <p className="score-text">Score: {myScore}</p>
             <h2 className="player-text">{myName} (You)</h2>
           </div>
         </div>
+
       </div>
 
       <div className="controls">

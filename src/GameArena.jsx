@@ -386,9 +386,10 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
       </div>
 
       <div className="arena">
+        
         {/* TOP: OPPONENT AREA */}
         <div className="player-area">
-          <div className="player-block-bottom">
+          <div className="player-info">
             <h2 className="player-text">{opponentName}</h2>
             <p className="score-text">Score: {opponentScore}</p>
           </div>
@@ -399,7 +400,7 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
              </span>
           </div>
 
-          <p className="status-text">
+          <p className="status-text" style={{ marginBottom: '30px' }}>
              {(phase === 'waiting' || phase === 'result') && (opponentReady ? "🟢 Ready!" : "")}
           </p>
 
@@ -436,7 +437,7 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
             {renderHistoryTrail(myHistory, matchHistory, currentFormat)}
           </div>
 
-          <p className="status-text">
+          <p className="status-text" style={{ marginTop: '30px' }}>
              {(phase === 'waiting' || phase === 'result') && (imReady ? "🟢 Ready!" : "")}
           </p>
           
@@ -451,11 +452,13 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
               <span className="choice-emoji">{myChoice ? getEmoji(myChoice) : ''}</span>
             )}
           </div>
-          <div className="player-block-bottom">
+          
+          <div className="player-info">
             <p className="score-text">Score: {myScore}</p>
             <h2 className="player-text">{myName} (You)</h2>
           </div>
         </div>
+
       </div>
 
       <div className="controls">

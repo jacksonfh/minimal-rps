@@ -73,7 +73,7 @@ html {
     color: var(--label-text);
 }
 
-.primary-button, .secondary-button, .rematch-button , .share-button, .leave-button{
+.primary-button, .secondary-button, .rematch-button, .share-button, .leave-button {
     border: none;
     padding: 14px;
     border-radius: 6px;
@@ -85,36 +85,17 @@ html {
     box-sizing: border-box;
 }
 
-.rematch-button{
-    background-color: var(--win);
-    color: var(--main-text);
-}
+.rematch-button { background-color: var(--win); color: var(--main-text); }
+.share-button { background-color: var(--accent2); color: var(--main-text); }
+.primary-button { background-color: var(--accent); color: var(--main-text); }
+.secondary-button { background-color: var(--button-bg); color: var(--main-text); }
+.leave-button { background-color: var(--loss); color: var(--main-text); }
 
-.share-button{
-    background-color: var(--accent2);
-    color: var(--main-text);
-}
-
-.primary-button {
-    background-color: var(--accent);
-    color: var(--main-text);
-}
-
-.secondary-button {
-    background-color: var(--button-bg);
-    color: var(--main-text);
-}
-
-.leave-button{
-    background-color: var(--loss);
-    color: var(--main-text);
-}
-
-.primary-button:active, .secondary-button:active {
+.primary-button:active, .secondary-button:active, .rematch-button:active, .share-button:active, .leave-button:active {
     transform: scale(0.95);
 }
 
-.primary-button:disabled, .secondary-button:disabled {
+.primary-button:disabled, .secondary-button:disabled, .rematch-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
@@ -148,7 +129,7 @@ html {
     align-items: center;
     background-color: var(--arena-bg);
     border-radius: 12px;
-    padding: clamp(5px, 1dvh, 5px) 5px;
+    padding: clamp(15px, 2vh, 25px) 15px;
     width: 100%;
     max-width: 600px;
     max-height: 80dvh;
@@ -156,31 +137,23 @@ html {
     position: relative;
 }
 
-/* --- Rigid Structure Classes (Prevents Shifting) --- */
+/* --- RIGID STRUCTURE CLASSES --- */
 .player-area {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between; 
     width: 100%;
     position: relative;
 }
 
-.player-block-top{
-    margin-bottom: 5dvh;
-}
-
-.player-block-bottom{
-    margin-top: 5dvh;
-}
-
 .center-area {
     width: 100%;
-    height: 110px; /* Locked height prevents shifting */
-    border-top: 1px solid var(--input-border);
-    border-bottom: 1px solid var(--input-border);
-    margin: 5px 0;
+    height: 110px; /* RIGID HEIGHT: Prevents shifting */
+    border-top: 2px solid var(--input-border); /* Central dividing lines */
+    border-bottom: 2px solid var(--input-border);
+    margin: 10px 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -189,15 +162,25 @@ html {
 }
 
 .center-text-wrapper {
-    height: 50px; /* Locked height for the changing text */
+    height: 45px; /* RIGID HEIGHT: Prevents text swapping from resizing center */
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+    width: 100%;
+}
+
+.player-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    z-index: 10;
 }
 
 .choice-container {
-    height: clamp(90px, 15dvh, 120px); /* Locked height for buttons/emojis */
+    flex: 1; /* SPRING: Pushes info to edges, keeps emojis centered */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -206,7 +189,7 @@ html {
 }
 
 .status-text {
-    height: 24px; /* Locked height for status messages */
+    height: 24px; /* RIGID HEIGHT: Keeps spacing identical when text disappears */
     margin: 0;
     color: var(--label-text);
     display: flex;
@@ -216,17 +199,17 @@ html {
 
 .player-text {
     font-size: clamp(1.1rem, 2.5vh, 1.5rem);
-    margin: 5px 0;
+    margin: 0;
 }
 
 .score-text {
-    margin: 5px 0;
+    margin: 0;
     color: var(--label-text);
     font-size: 0.9rem;
 }
 
 .choice-emoji {
-    font-size: clamp(5rem, 12dvh, 7.5rem);
+    font-size: clamp(4rem, 8vh, 6.5rem); /* Massive feature emojis */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -242,7 +225,7 @@ html {
     transition: all 0.2s;
 }
 
-/* --- Shared Game UI Components --- */
+/* --- TIMELINES & HISTORY --- */
 .timeline-container {
     display: flex;
     gap: 8px;
@@ -286,15 +269,21 @@ html {
 
 .history-top {
     position: absolute;
-    bottom: 0px; /* Pinned to the center line */
+    bottom: 5px; /* Pinned directly above the center dividing line */
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 .history-bottom {
     position: absolute;
-    top: 0px; /* Pinned to the center line */
+    top: 5px; /* Pinned directly below the center dividing line */
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
-/* --- Utilities --- */
+/* --- UTILITIES --- */
 .controls {
     display: flex;
     justify-content: center;
@@ -364,18 +353,6 @@ html {
     text-align: left;
 }
 
-.menu-dropdown button.disabled-link {
-    opacity: 0.5;
-}
-
-.menu-dropdown button.leave-match {
-    background-color: var(--loss);
-    border-radius: 4px;
-    font-weight: bold;
-}
-
-.header-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+.menu-dropdown button.disabled-link { opacity: 0.5; }
+.menu-dropdown button.leave-match { background-color: var(--loss); border-radius: 4px; font-weight: bold; }
+.header-controls { display: flex; align-items: center; gap: 10px; }
