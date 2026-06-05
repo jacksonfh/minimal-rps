@@ -12,6 +12,11 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
   const [imReady, setImReady] = useState(false);
   const [opponentReady, setOpponentReady] = useState(false);
   
+  const imReadyRef = useRef(false);
+  useEffect(() => {
+    imReadyRef.current = imReady;
+  }, [imReady]);
+
   const [showCode, setShowCode] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showMenu, setShowMenu] = useState(false); 
@@ -30,6 +35,8 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
 
   const [timeLeft, setTimeLeft] = useState(30);
   const [revealTime, setRevealTime] = useState(3);
+
+  const [notification, setNotification] = useState(null);
 
   const getEmoji = (choice) => {
     const map = { rock: '🪨', paper: '📄', scissors: '✂️', timeout: '⏳' };
@@ -175,9 +182,22 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
   useEffect(() => {
     const room = supabase.channel(`room_${roomCode}`);
 
-    room.on('broadcast', { event: 'guest_joined' }, () => {
+    room.on('broadcast', { event: 'ping_lobby' }, () => {
       if (isHost) {
-        room.send({ type: 'broadcast', event: 'sync_format', payload: { format: currentFormat } });
+        // Now includes hostReady!
+        room.send({ type: 'broadcast', event: 'sync_format', payload: { format: currentFormat, hostName: myName, hostReady: imReadyRef.current } });
+      }
+    });
+
+    room.on('broadcast', { event: 'guest_joined' }, (message) => {
+      if (isHost) {
+        const guest = message.payload.guestName || 'Someone';
+        setOpponentName(guest);
+        // Sync guest ready state just in case
+        setNotification(`${guest} joined the lobby!`);
+        setTimeout(() => setNotification(null), 3000);
+        // Include hostReady!
+        room.send({ type: 'broadcast', event: 'sync_format', payload: { format: currentFormat, hostName: myName, hostReady: imReadyRef.current } });
       }
     });
 
@@ -198,12 +218,26 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
     });
 
     room.on('broadcast', { event: 'sync_format' }, (message) => {
-      if (!isHost) setCurrentFormat(message.payload.format);
+      if (!isHost) {
+        setCurrentFormat(message.payload.format);
+        if (message.payload.hostName) {
+          setOpponentName((prev) => {
+            if (prev === 'Waiting for opponent...') {
+              setNotification(`Joined ${message.payload.hostName}'s lobby!`);
+              setTimeout(() => setNotification(null), 3000);
+            }
+            return message.payload.hostName;
+          });
+        }
+        if (message.payload.hostReady !== undefined) {
+          setOpponentReady(message.payload.hostReady);
+        }
+      }
     });
 
     room.on('broadcast', { event: 'player_forfeited' }, (message) => {
       if (message.payload.player !== myName) {
-        setRoundResult('Opponent Forfeited!');
+        setRoundResult('Opponent Left!');
         setMyScore(winsNeeded);
         setPhase('gameover');
         saveMatchHistory();
@@ -218,13 +252,39 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
     return () => supabase.removeChannel(room);
   }, [roomCode, myName, isHost, currentFormat, winsNeeded, saveMatchHistory]);
 
-  // Restored 30 seconds
   useEffect(() => {
-    if (phase === 'waiting' && imReady && opponentReady) {
-      setPhase('picking');
-      setTimeLeft(30); 
+    if (isConnected && channelRef.current) {
+      if (isHost) {
+        channelRef.current.send({ 
+          type: 'broadcast', 
+          event: 'sync_format', 
+          payload: { format: currentFormat, hostName: myName, hostReady: imReadyRef.current } 
+        });
+      } else {
+        channelRef.current.send({ 
+          type: 'broadcast', 
+          event: 'guest_joined', 
+          payload: { guestName: myName, guestReady: imReadyRef.current } 
+        });
+      }
     }
-  }, [imReady, opponentReady, phase]);
+  }, [isConnected, isHost, currentFormat, myName]);
+
+  useEffect(() => {
+  if ((phase === 'waiting' || phase === 'result') && imReady && opponentReady) {
+    const asyncTimer = setTimeout(() => {
+      setMyChoice(null);
+      setOpponentChoice(null);
+      setTimeLeft(30);
+      setRevealTime(3);
+      setRoundResult('');
+      setImReady(false);
+      setOpponentReady(false);
+      setPhase('picking');
+    }, 0);
+    return () => clearTimeout(asyncTimer);
+  }
+  }, [phase, imReady, opponentReady]);
 
   useEffect(() => {
     if (phase === 'picking' && myChoice && opponentChoice) {
@@ -269,19 +329,6 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
     }
   }, [phase, revealTime, calculateWinner]);
 
-  // Restored 30 seconds
-  useEffect(() => {
-    if (phase === 'result') {
-      const t = setTimeout(() => {
-        setMyChoice(null);
-        setOpponentChoice(null);
-        setPhase('picking');
-        setTimeLeft(30); 
-      }, 3000);
-      return () => clearTimeout(t);
-    }
-  }, [phase]);
-
   useEffect(() => {
     if (phase === 'gameover' && imRematchReady && opponentRematchReady) {
       setTimeout(() => {
@@ -300,15 +347,40 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
     }
   }, [phase, imRematchReady, opponentRematchReady]);
 
+  useEffect(() => {
+    const handleWindowClose = () => {
+      if (channelRef.current) {
+        // Attempt to send a parting message to the opponent
+        channelRef.current.send({
+          type: 'broadcast',
+          event: 'player_forfeited',
+          payload: { player: myName }
+        });
+      }
+    };
+
+    window.addEventListener('beforeunload', handleWindowClose);
+    return () => window.removeEventListener('beforeunload', handleWindowClose);
+  }, [myName]);
+
   return (
     <div className="container" style={{ position: 'relative' }}>
       
+      {/* NEW: GENERIC FLOATING NOTIFICATION */}
+      {notification && (
+        <div className="rematch-notification">
+          {notification}
+        </div>
+      )}
+
+      {/* FLOATING REMATCH NOTIFICATION */}
       {opponentRematchReady && !imRematchReady && phase === 'gameover' && (
         <div className="rematch-notification">
           Opponent requested a rematch!
         </div>
       )}
 
+      {/* MENU DROPDOWN */}
       {showMenu && (
         <div className="menu-dropdown">
           <button className="disabled-link">Leaderboard (Soon)</button>
@@ -320,6 +392,7 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
         </div>
       )}
 
+      {/* HEADER */}
       <div className="arena-header">
         <div>
           Room: {' '}
@@ -354,38 +427,59 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
       </div>
 
       <div className="arena">
-        <div>
-          <h2 className="player-text">{opponentName}</h2>
-          <p style={{ margin: '5px 0', color: 'var(--label-text)', textAlign: 'center' }}>Score: {opponentScore}</p>
+        
+        {/* TOP: OPPONENT AREA */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+          <h2 className="player-text" style={{ marginBottom: '5px' }}>{opponentName}</h2>
+          <p style={{ margin: '0 0 10px 0', color: 'var(--label-text)', textAlign: 'center' }}>Score: {opponentScore}</p>
+          <span style={{ fontSize: 'clamp(3rem, 6vh, 4.5rem)', minHeight: '1.2em' }}>
+            {(phase === 'result' || phase === 'gameover') ? getEmoji(opponentChoice) : (opponentChoice ? '🔒' : '❔')}
+          </span>
+          <p style={{ color: 'var(--label-text)', marginTop: '10px', minHeight: '20px' }}>
+             {(phase === 'waiting' || phase === 'result') && (opponentReady ? "🟢 Ready!" : "")}
+          </p>
         </div>
 
-        <div className="center-area">
-          {phase === 'waiting' && <p style={{ color: 'var(--label-text)' }}>Waiting for players to ready up...</p>}
+        {/* MIDDLE: TIMELINE & TIMERS */}
+        <div className="center-area" style={{ width: '100%', borderTop: '1px solid var(--input-border)', borderBottom: '1px solid var(--input-border)', margin: '10px 0', flexDirection: 'column', padding: '15px 0' }}>
           
-          {/* Math.max prevents the user from seeing the internal -3 second grace period */}
-          {phase === 'picking' && <h1 style={{ fontSize: 'clamp(2.5rem, 6vh, 4rem)', margin: 0 }}>{Math.max(0, timeLeft)}</h1>}
+          {/* NOTCHES ARE BACK IN THE CENTER */}
+          <div style={{ marginBottom: '15px', width: '100%' }}>
+            {renderTimeline()}
+          </div>
+
+          {phase === 'waiting' && <p style={{ color: 'var(--label-text)', margin: 0 }}>Waiting for players to ready up...</p>}
           
-          {phase === 'reveal' && <h1 style={{ fontSize: 'clamp(2rem, 5vh, 3rem)', margin: 0 }}>Revealing in {revealTime}...</h1>}
+          {phase === 'picking' && <h1 style={{ fontSize: 'clamp(2.5rem, 6vh, 4rem)', margin: 0, color: timeLeft <= 5 ? 'var(--loss)' : 'var(--main-text)' }}>{Math.max(0, timeLeft)}s</h1>}
+          
+          {phase === 'reveal' && <h1 style={{ fontSize: 'clamp(2rem, 5vh, 3rem)', margin: 0, color: 'var(--accent)' }}>Revealing in {revealTime}...</h1>}
+          
           {(phase === 'result' || phase === 'gameover') && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-              <div style={{ fontSize: 'clamp(3rem, 6vh, 4rem)' }}>{getEmoji(myChoice)}</div>
-              <h1 className="vs">{roundResult}</h1>
-              <div style={{ fontSize: 'clamp(3rem, 6vh, 4rem)' }}>{getEmoji(opponentChoice)}</div>
-            </div>
+             <h1 className="vs" style={{ 
+               color: phase === 'gameover' ? (myScore >= winsNeeded ? 'var(--win)' : 'var(--loss)') : (roundResult === 'Tie!' ? 'var(--tie)' : (roundResult === 'You Win!' ? 'var(--win)' : 'var(--loss)')), 
+               fontSize: phase === 'gameover' ? 'clamp(2rem, 5vh, 2.5rem)' : 'clamp(2rem, 5vh, 3rem)',
+               margin: 0
+             }}>
+               {phase === 'gameover' ? (myScore >= winsNeeded ? 'MATCH WON!' : 'MATCH LOST!') : roundResult}
+             </h1>
           )}
         </div>
 
-        <div>
-          <h2 className="player-text">{myName} (You)</h2>
-          <p style={{ margin: '5px 0', color: 'var(--label-text)', textAlign: 'center' }}>Score: {myScore}</p>
+        {/* BOTTOM: PLAYER AREA */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+          <p style={{ color: 'var(--label-text)', marginBottom: '10px', minHeight: '20px' }}>
+             {(phase === 'waiting' || phase === 'result') && (imReady ? "🟢 Ready!" : "")}
+          </p>
+          <span style={{ fontSize: 'clamp(3rem, 6vh, 4.5rem)', minHeight: '1.2em' }}>
+            {(phase === 'result' || phase === 'gameover') ? getEmoji(myChoice) : (myChoice ? getEmoji(myChoice) : '❔')}
+          </span>
+          <p style={{ margin: '10px 0 0 0', color: 'var(--label-text)', textAlign: 'center' }}>Score: {myScore}</p>
+          <h2 className="player-text" style={{ marginTop: '5px' }}>{myName} (You)</h2>
         </div>
 
-        <div style={{ width: '100%', margin: '5px 0' }}>
-          {renderTimeline()}
-        </div>
-
+        {/* CONTROLS */}
         <div className="controls">
-          {phase === 'waiting' && (
+          {(phase === 'waiting' || phase === 'result') && (
             <button 
               className="primary-button" 
               onClick={handleReady}
@@ -427,4 +521,4 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
       </div>
     </div>
   );
-}
+};

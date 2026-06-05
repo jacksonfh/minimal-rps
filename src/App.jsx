@@ -44,7 +44,8 @@ export default function App() {
 
     checkRoom.subscribe(async (status) => {
       if (status === 'SUBSCRIBED') {
-        await checkRoom.send({ type: 'broadcast', event: 'guest_joined', payload: {} });
+        // Send a ping to check if lobby exists without triggering the host's alert yet
+        await checkRoom.send({ type: 'broadcast', event: 'ping_lobby', payload: {} });
 
         setTimeout(() => {
           supabase.removeChannel(checkRoom); 
@@ -56,7 +57,7 @@ export default function App() {
           } else {
             alert("Lobby not found! Make sure the host is currently in the room.");
           }
-        }, 1500);
+        }, 2500); // 2.5s gives mobile networks enough time to respond
       }
     });
   };
