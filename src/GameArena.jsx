@@ -34,7 +34,7 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
   const [roundResult, setRoundResult] = useState('');
 
   const [timeLeft, setTimeLeft] = useState(30);
-  const [revealTime, setRevealTime] = useState(3);
+  const [revealTime, setRevealTime] = useState(4);
 
   const [notification, setNotification] = useState(null);
 
@@ -276,7 +276,7 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
       setMyChoice(null);
       setOpponentChoice(null);
       setTimeLeft(30);
-      setRevealTime(3);
+      setRevealTime(4);
       setRoundResult('');
       setImReady(false);
       setOpponentReady(false);
@@ -289,7 +289,7 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
   useEffect(() => {
     if (phase === 'picking' && myChoice && opponentChoice) {
       setPhase('reveal');
-      setRevealTime(3);
+      setRevealTime(4);
     }
   }, [myChoice, opponentChoice, phase]);
 
@@ -318,16 +318,27 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
   }, [phase, timeLeft, myChoice, opponentChoice, handleChoice]);
   // -------------------------
 
-  useEffect(() => {
+useEffect(() => {
     if (phase === 'reveal') {
-      if (revealTime > 0) {
-        const t = setTimeout(() => setRevealTime(revealTime - 1), 1000);
+      if (revealTime >= 0) { // Changed to >= 0 to allow "Shoot!" to render
+        const t = setTimeout(() => setRevealTime(revealTime - 1), 700); // 700ms feels like a real chant
         return () => clearTimeout(t);
       } else {
         calculateWinner();
       }
     }
   }, [phase, revealTime, calculateWinner]);
+
+  // Add this new helper function right below that useEffect
+  const getRevealText = () => {
+    switch (revealTime) {
+      case 3: return "Rock...";
+      case 2: return "Paper...";
+      case 1: return "Scissors...";
+      case 0: return "Shoot!";
+      default: return "";
+    }
+  };
 
   useEffect(() => {
     if (phase === 'gameover' && imRematchReady && opponentRematchReady) {
@@ -432,9 +443,12 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
           <h2 className="player-text" style={{ marginBottom: '5px' }}>{opponentName}</h2>
           <p style={{ margin: '0 0 10px 0', color: 'var(--label-text)', textAlign: 'center' }}>Score: {opponentScore}</p>
-          <span style={{ fontSize: 'clamp(3rem, 6vh, 4.5rem)', minHeight: '1.2em' }}>
-            {(phase === 'result' || phase === 'gameover') ? getEmoji(opponentChoice) : (opponentChoice ? '🔒' : '❔')}
+          
+          {/* Removed the question mark, leaving it blank until locked */}
+          <span style={{ fontSize: 'clamp(3rem, 6vh, 4.5rem)', minHeight: '1.2em', display: 'flex', alignItems: 'center' }}>
+            {(phase === 'result' || phase === 'gameover') ? getEmoji(opponentChoice) : (opponentChoice ? '🔒' : '')}
           </span>
+          
           <p style={{ color: 'var(--label-text)', marginTop: '10px', minHeight: '20px' }}>
              {(phase === 'waiting' || phase === 'result') && (opponentReady ? "🟢 Ready!" : "")}
           </p>
@@ -443,7 +457,6 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
         {/* MIDDLE: TIMELINE & TIMERS */}
         <div className="center-area" style={{ width: '100%', borderTop: '1px solid var(--input-border)', borderBottom: '1px solid var(--input-border)', margin: '10px 0', flexDirection: 'column', padding: '15px 0' }}>
           
-          {/* NOTCHES ARE BACK IN THE CENTER */}
           <div style={{ marginBottom: '15px', width: '100%' }}>
             {renderTimeline()}
           </div>
@@ -452,7 +465,12 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
           
           {phase === 'picking' && <h1 style={{ fontSize: 'clamp(2.5rem, 6vh, 4rem)', margin: 0, color: timeLeft <= 5 ? 'var(--loss)' : 'var(--main-text)' }}>{Math.max(0, timeLeft)}s</h1>}
           
-          {phase === 'reveal' && <h1 style={{ fontSize: 'clamp(2rem, 5vh, 3rem)', margin: 0, color: 'var(--accent)' }}>Revealing in {revealTime}...</h1>}
+          {/* Implement the new Rock, Paper, Scissors, Shoot text! */}
+          {phase === 'reveal' && (
+            <h1 style={{ fontSize: 'clamp(2rem, 5vh, 3.5rem)', margin: 0, color: 'var(--accent)' }}>
+              {getRevealText()}
+            </h1>
+          )}
           
           {(phase === 'result' || phase === 'gameover') && (
              <h1 className="vs" style={{ 
@@ -470,14 +488,27 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
           <p style={{ color: 'var(--label-text)', marginBottom: '10px', minHeight: '20px' }}>
              {(phase === 'waiting' || phase === 'result') && (imReady ? "🟢 Ready!" : "")}
           </p>
-          <span style={{ fontSize: 'clamp(3rem, 6vh, 4.5rem)', minHeight: '1.2em' }}>
-            {(phase === 'result' || phase === 'gameover') ? getEmoji(myChoice) : (myChoice ? getEmoji(myChoice) : '❔')}
-          </span>
+          
+          {/* New Interactive Choice Area */}
+          <div style={{ minHeight: 'clamp(3rem, 6vh, 4.5rem)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px' }}>
+            {phase === 'picking' && !myChoice ? (
+              <>
+                <button className="play-button" onClick={() => handleChoice('rock')}>🪨</button>
+                <button className="play-button" onClick={() => handleChoice('paper')}>📄</button>
+                <button className="play-button" onClick={() => handleChoice('scissors')}>✂️</button>
+              </>
+            ) : (
+              <span style={{ fontSize: 'clamp(3rem, 6vh, 4.5rem)' }}>
+                {myChoice ? getEmoji(myChoice) : ''}
+              </span>
+            )}
+          </div>
+
           <p style={{ margin: '10px 0 0 0', color: 'var(--label-text)', textAlign: 'center' }}>Score: {myScore}</p>
           <h2 className="player-text" style={{ marginTop: '5px' }}>{myName} (You)</h2>
         </div>
 
-        {/* CONTROLS */}
+        {/* CONTROLS (Play buttons removed from here) */}
         <div className="controls">
           {(phase === 'waiting' || phase === 'result') && (
             <button 
@@ -488,14 +519,6 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
             >
               {!isConnected ? 'Connecting...' : (imReady ? 'Waiting for Opponent...' : 'I Am Ready!')}
             </button>
-          )}
-
-          {(phase === 'picking' || phase === 'reveal') && (
-            <>
-              <button className="play-button" onClick={() => handleChoice('rock')} disabled={myChoice !== null} style={{ opacity: myChoice && myChoice !== 'rock' ? 0.3 : 1 }}>🪨</button>
-              <button className="play-button" onClick={() => handleChoice('paper')} disabled={myChoice !== null} style={{ opacity: myChoice && myChoice !== 'paper' ? 0.3 : 1 }}>📄</button>
-              <button className="play-button" onClick={() => handleChoice('scissors')} disabled={myChoice !== null} style={{ opacity: myChoice && myChoice !== 'scissors' ? 0.3 : 1 }}>✂️</button>
-            </>
           )}
 
           {phase === 'gameover' && (
