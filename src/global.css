@@ -4,6 +4,7 @@
     --loss: #ff4444;
     --tie: #ffeb3b;
     --accent: #8a2be2;
+    --accent2: #2b77e2;
     --main-bg: #121212;
     --card-bg: #1e1e1e;
     --input-bg: #2a2a2a;
@@ -22,12 +23,11 @@ html {
     background-color: var(--main-bg);
     font-family: 'Inter', sans-serif;
     overscroll-behavior: none; 
-    overflow: hidden; /* Strictly locks the screen from scrolling */
+    overflow: hidden;
     width: 100%;
-    height: 100dvh; /* Forces exact device screen height */
+    height: 100dvh;
 }
 
-/* --- Shared/Layout --- */
 .container {
     color: var(--main-text);
     height: 100dvh;
@@ -50,7 +50,6 @@ html {
     box-sizing: border-box;
 }
 
-/* --- Restored Input Stylings --- */
 .input, .select {
     background-color: var(--input-bg);
     color: var(--main-text);
@@ -74,7 +73,7 @@ html {
     color: var(--label-text);
 }
 
-.primary-button, .secondary-button {
+.primary-button, .secondary-button, .rematch-button , .share-button{
     border: none;
     padding: 14px;
     border-radius: 6px;
@@ -86,13 +85,23 @@ html {
     box-sizing: border-box;
 }
 
+.rematch-button{
+    background-color: var(--win);
+    color: var(--main-text);
+}
+
+.share-button{
+    background-color: var(--accent2);
+    color: var(--main-text);
+}
+
 .primary-button {
     background-color: var(--accent);
     color: var(--main-text);
 }
 
 .secondary-button {
-    background-color: var(--input-border);
+    background-color: var(--loss);
     color: var(--main-text);
 }
 
@@ -113,7 +122,6 @@ html {
     margin: clamp(10px, 2vh, 20px) 0;
 }
 
-/* --- Arena Refactored to Fit Viewport --- */
 .arena-header {
     display: flex;
     justify-content: space-between;
@@ -132,33 +140,83 @@ html {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly; /* Dynamically evenly spaces children */
     align-items: center;
     background-color: var(--arena-bg);
     border-radius: 12px;
-    padding: clamp(10px, 2vh, 30px) 20px;
+    padding: clamp(15px, 3vh, 30px) 20px;
     width: 100%;
     max-width: 600px;
-    max-height: 80dvh; /* Hard cap prevents blowing past the screen */
+    max-height: 80dvh;
     box-sizing: border-box;
+    position: relative;
+}
+
+/* --- Rigid Structure Classes (Prevents Shifting) --- */
+.player-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative;
 }
 
 .center-area {
-    height: clamp(60px, 12vh, 150px);
+    width: 100%;
+    height: 110px; /* Locked height prevents shifting */
+    border-top: 1px solid var(--input-border);
+    border-bottom: 1px solid var(--input-border);
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.center-text-wrapper {
+    height: 50px; /* Locked height for the changing text */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.choice-container {
+    height: clamp(60px, 10vh, 90px); /* Locked height for buttons/emojis */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.status-text {
+    height: 24px; /* Locked height for status messages */
+    margin: 0;
+    color: var(--label-text);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.vs {
-    font-size: clamp(1.8rem, 4vh, 3rem);
-    color: var(--input-border);
-    margin: 0;
-}
-
 .player-text {
     font-size: clamp(1.1rem, 2.5vh, 1.5rem);
-    margin: 0;
+    margin: 5px 0;
+}
+
+.score-text {
+    margin: 5px 0;
+    color: var(--label-text);
+    font-size: 0.9rem;
+}
+
+.choice-emoji {
+    font-size: clamp(3rem, 6vh, 4.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .play-button {
@@ -171,14 +229,68 @@ html {
     transition: all 0.2s;
 }
 
+/* --- Shared Game UI Components --- */
+.timeline-container {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.timeline-notch {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.history-trail {
+    display: flex;
+    gap: 8px;
+    opacity: 0.6;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+.history-item {
+    width: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 24px;
+}
+
+.ghost-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--input-border);
+    opacity: 0.4;
+}
+
+.history-top {
+    position: absolute;
+    bottom: 5px; /* Pinned to the center line */
+}
+
+.history-bottom {
+    position: absolute;
+    top: 5px; /* Pinned to the center line */
+}
+
+/* --- Utilities --- */
 .controls {
     display: flex;
     justify-content: center;
     gap: clamp(10px, 2vw, 20px);
     width: 100%;
+    margin-top: 20px;
+    max-width: 600px;
 }
 
-/* --- Utilities & Dropdowns --- */
 .loading-button {
     display: flex;
     justify-content: center;
@@ -211,6 +323,8 @@ html {
     font-weight: bold;
     z-index: 50;
     box-shadow: var(--box-shadow);
+    text-align: center;
+    white-space: nowrap;
 }
 
 .menu-dropdown {

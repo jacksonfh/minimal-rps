@@ -1,37 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-
-// Math trick using UTC time to generate the exact same sequence for everyone on earth today
-const getDailySequence = () => {
-  const today = new Date();
-  
-  // FIXED: Using UTC ensures the whole globe rolls over to the next puzzle at the exact same second
-  const seedString = `${today.getUTCFullYear()}-${today.getUTCMonth() + 1}-${today.getUTCDate()}`;
-  
-  // Simple hashing function
-  let hash = 0;
-  for (let i = 0; i < seedString.length; i++) {
-    hash = ((hash << 5) - hash) + seedString.charCodeAt(i);
-    hash |= 0; 
-  }
-
-  const moves = ['rock', 'paper', 'scissors'];
-  const sequence = [];
-  
-  // Seed a random number generator using the date hash
-  const seededRandom = () => {
-    const x = Math.sin(hash++) * 10000;
-    return x - Math.floor(x);
-  };
-
-  // Generate the 5 moves for the day
-  for (let i = 0; i < 100; i++) {
-    sequence.push(moves[Math.floor(seededRandom() * moves.length)]);
-  }
-  return sequence;
-};
+import { getEmoji, getRevealText, renderTimeline, renderHistoryTrail, getDailySequence } from './utils/gameUtils';
 
 export default function DailyArena({ myName }) {
-  const format = 5; // Daily challenge is always Best of 5
+  const format = 5; 
   const winsNeeded = 3;
   
   const [dailySequence] = useState(getDailySequence());
@@ -52,76 +23,9 @@ export default function DailyArena({ myName }) {
   const [revealTime, setRevealTime] = useState(3);
   const [notification, setNotification] = useState(null);
 
-
-  const getEmoji = (choice) => {
-    const map = { rock: '🪨', paper: '📄', scissors: '✂️' };
-    return map[choice] || '';
-  };
-
-  const getRevealText = () => {
-    switch (revealTime) {
-      case 3: return "Rock...";
-      case 2: return "Paper...";
-      case 1: return "Scissors...";
-      case 0: return "Shoot!";
-      default: return "";
-    }
-  };
-
-  const renderTimeline = () => {
-    const tiesCount = matchHistory.filter(res => res === 'tie').length;
-    const totalNotches = format + tiesCount;
-
-    return (
-      <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
-        {[...Array(totalNotches)].map((_, i) => {
-          let color = 'var(--input-border)';
-          let hasShadow = false;
-          if (i < matchHistory.length) {
-            const res = matchHistory[i];
-            if (res === 'win') color = 'var(--win)';
-            if (res === 'lose') color = 'var(--loss)';
-            if (res === 'tie') color = 'var(--tie)';
-            hasShadow = true;
-          }
-          return (
-            <div 
-              key={i} 
-              style={{ 
-                width: '14px', height: '14px', borderRadius: '50%', 
-                backgroundColor: color, boxShadow: hasShadow ? `0 0 8px ${color}` : 'none',
-                transition: 'all 0.3s ease'
-              }} 
-            />
-          );
-        })}
-      </div>
-    );
-  };
-
-  const renderHistoryTrail = (history) => {
-    const tiesCount = matchHistory.filter(res => res === 'tie').length;
-    const totalNotches = format + tiesCount; // Uses format for Daily mode!
-
-    return (
-      <div style={{ display: 'flex', gap: '8px', opacity: 0.8, fontSize: '1.1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-        {[...Array(totalNotches)].map((_, i) => (
-          <div key={i} style={{ width: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '24px' }}>
-            {i < history.length ? (
-              <span>{getEmoji(history[i])}</span>
-            ) : (
-              <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--input-border)', opacity: 0.4 }} />
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   const handleChoice = (choice) => {
     if (myChoice || phase !== 'picking') return;
     setMyChoice(choice);
-    // The "Global Opponent" pulls its move from the seeded array!
     setOpponentChoice(dailySequence[currentRound]);
     setPhase('reveal');
     setRevealTime(3);
@@ -152,7 +56,6 @@ export default function DailyArena({ myName }) {
 
     setMyHistory(prev => [...prev, myChoice]);
     setOpponentHistory(prev => [...prev, opponentChoice]);
-
     setCurrentRound(prev => prev + 1);
 
     if (newMyScore >= winsNeeded || newOpponentScore >= winsNeeded) {
@@ -181,7 +84,7 @@ export default function DailyArena({ myName }) {
         setRevealTime(3);
         setRoundResult('');
         setPhase('picking');
-      }, 2500); // Wait 2.5s to show the result before advancing
+      }, 2500); 
       return () => clearTimeout(asyncTimer);
     }
   }, [phase]);
@@ -189,7 +92,7 @@ export default function DailyArena({ myName }) {
   const handleShare = () => {
     const today = new Date();
     const dateStr = `${today.getMonth() + 1}/${today.getDate()}`;
-    const title = `RPSdle - ${dateStr}\n`;
+    const title = `RochamDle - ${dateStr}\n`;
     
     const emojiTimeline = matchHistory.map(res => {
       if (res === 'win') return '🟢';
@@ -203,63 +106,62 @@ export default function DailyArena({ myName }) {
   };
 
   return (
-    <div className="container" style={{ position: 'relative', justifyContent: 'flex-start', paddingTop: 'clamp(20px, 5vh, 40px)' }}>
-      
+    <div className="container">
       {notification && <div className="rematch-notification">{notification}</div>}
 
-      <div className="arena-header" style={{ marginBottom: '10px', justifyContent: 'center' }}>
+      <div className="arena-header" style={{ justifyContent: 'center' }}>
         <span style={{ color: 'var(--main-text)', fontWeight: 'bold' }}>Daily Challenge (Best of 5)</span>
       </div>
 
-      {/* THE ARENA */}
-      <div className="arena" style={{ padding: 'clamp(15px, 3vh, 30px) 20px', flexGrow: 0, height: 'auto', minHeight: '50vh' }}>
-        
+      <div className="arena">
         {/* TOP: GLOBAL OPPONENT */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-          <h2 className="player-text" style={{ marginBottom: '5px' }}>Rochambeaudle:</h2>
-          <p style={{ margin: '0 0 10px 0', color: 'var(--label-text)', textAlign: 'center' }}>Score: {opponentScore}</p>
+        <div className="player-area">
+          <h2 className="player-text">The Globe 🌍</h2>
+          <p className="score-text">Score: {opponentScore}</p>
           
-          <span style={{ fontSize: 'clamp(3rem, 6vh, 4.5rem)', minHeight: '1.2em', display: 'flex', alignItems: 'center' }}>
-            {(phase === 'result' || phase === 'gameover') ? getEmoji(opponentChoice) : (opponentChoice ? '🔒' : '')}
-          </span>
+          <div className="choice-container">
+            <span className="choice-emoji">
+              {(phase === 'result' || phase === 'gameover') ? getEmoji(opponentChoice) : (opponentChoice ? '🔒' : '❔')}
+            </span>
+          </div>
           
-          <div style={{ minHeight: '20px', marginTop: '10px' }} />
+          <p className="status-text"></p>
+
+          <div className="history-top">
+            {renderHistoryTrail(opponentHistory, matchHistory, format)}
+          </div>
         </div>
 
         {/* MIDDLE: TIMELINE */}
-        {/* ADDED: position: 'relative' and increased padding to 25px */}
-        <div className="center-area" style={{ width: '100%', borderTop: '1px solid var(--input-border)', borderBottom: '1px solid var(--input-border)', margin: '10px 0', flexDirection: 'column', padding: '25px 0', position: 'relative' }}>
+        <div className="center-area">
+          <div style={{ marginBottom: '10px', width: '100%' }}>
+            {renderTimeline(matchHistory, format)}
+          </div>
           
-          {/* MOVED: Globe History inside the center border */}
-          <div style={{ position: 'absolute', top: '5px', width: '100%', display: 'flex', justifyContent: 'center' }}>
-            {renderHistoryTrail(opponentHistory)}
-          </div>
-
-          <div style={{ margin: '10px 0', width: '100%' }}>
-            {renderTimeline()}
-          </div>
-          {phase === 'picking' && <h1 style={{ fontSize: 'clamp(1.5rem, 4vh, 2rem)', margin: 0, color: 'var(--main-text)' }}>Make your move...</h1>}
-          {phase === 'reveal' && <h1 style={{ fontSize: 'clamp(2rem, 5vh, 3.5rem)', margin: 0, color: 'var(--accent)' }}>{getRevealText()}</h1>}
-          {(phase === 'result' || phase === 'gameover') && (
-             <h1 className="vs" style={{ 
-               color: phase === 'gameover' ? (myScore >= winsNeeded ? 'var(--win)' : 'var(--loss)') : (roundResult === 'Tie!' ? 'var(--tie)' : (roundResult === 'You Win!' ? 'var(--win)' : 'var(--loss)')), 
-               fontSize: phase === 'gameover' ? 'clamp(2rem, 5vh, 2.5rem)' : 'clamp(2rem, 5vh, 3rem)',
-               margin: 0
-             }}>
-               {phase === 'gameover' ? (myScore >= winsNeeded ? 'DAILY WON!' : 'DAILY LOST!') : roundResult}
-             </h1>
-          )}
-
-          {/* MOVED: Player History inside the center border */}
-          <div style={{ position: 'absolute', bottom: '5px', width: '100%', display: 'flex', justifyContent: 'center' }}>
-            {renderHistoryTrail(myHistory)}
+          <div className="center-text-wrapper">
+            {phase === 'picking' && <h1 style={{ fontSize: 'clamp(1.5rem, 4vh, 2.5rem)', margin: 0, color: 'var(--main-text)' }}>Make your move...</h1>}
+            {phase === 'reveal' && <h1 style={{ fontSize: 'clamp(2rem, 4vh, 3rem)', margin: 0, color: 'var(--accent)' }}>{getRevealText(revealTime)}</h1>}
+            {(phase === 'result' || phase === 'gameover') && (
+               <h1 style={{ 
+                 color: phase === 'gameover' ? (myScore >= winsNeeded ? 'var(--win)' : 'var(--loss)') : (roundResult === 'Tie!' ? 'var(--tie)' : (roundResult === 'You Win!' ? 'var(--win)' : 'var(--loss)')), 
+                 fontSize: phase === 'gameover' ? 'clamp(2rem, 5vh, 2.5rem)' : 'clamp(2rem, 5vh, 3rem)',
+                 margin: 0
+               }}>
+                 {phase === 'gameover' ? (myScore >= winsNeeded ? 'DAILY WON!' : 'DAILY LOST!') : roundResult}
+               </h1>
+            )}
           </div>
         </div>
 
         {/* BOTTOM: YOU */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-          <div style={{ minHeight: '20px', marginBottom: '10px' }} />
-          <div style={{ minHeight: 'clamp(3rem, 6vh, 4.5rem)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px' }}>
+        <div className="player-area">
+          <div className="history-bottom">
+            {renderHistoryTrail(myHistory, matchHistory, format)}
+          </div>
+
+          <p className="status-text"></p>
+
+          <div className="choice-container">
             {phase === 'picking' && !myChoice ? (
               <>
                 <button className="play-button" onClick={() => handleChoice('rock')}>🪨</button>
@@ -267,29 +169,22 @@ export default function DailyArena({ myName }) {
                 <button className="play-button" onClick={() => handleChoice('scissors')}>✂️</button>
               </>
             ) : (
-              <span style={{ fontSize: 'clamp(3rem, 6vh, 4.5rem)' }}>{myChoice ? getEmoji(myChoice) : ''}</span>
+              <span className="choice-emoji">{myChoice ? getEmoji(myChoice) : ''}</span>
             )}
           </div>
-          <p style={{ margin: '10px 0 0 0', color: 'var(--label-text)', textAlign: 'center' }}>Score: {myScore}</p>
-          <h2 className="player-text" style={{ marginTop: '5px' }}>{myName} (You)</h2>
+
+          <p className="score-text">Score: {myScore}</p>
+          <h2 className="player-text">{myName} (You)</h2>
         </div>
       </div>
 
-      <div className="controls" style={{ marginTop: '20px', width: '100%', maxWidth: '600px' }}>
+      <div className="controls">
         {phase === 'gameover' && (
           <div style={{ display: 'flex', gap: '15px', width: '100%' }}>
-            <button 
-              className="primary-button" 
-              style={{ flex: 1, padding: '15px', fontSize: '1.1rem', backgroundColor: 'var(--accent)' }} 
-              onClick={handleShare}
-            >
+            <button className="primary-button" style={{ flex: 1 }} onClick={handleShare}>
               Share Results
             </button>
-            <button 
-              className="secondary-button" 
-              style={{ flex: 1, padding: '15px', fontSize: '1.1rem' }} 
-              onClick={() => window.location.reload()}
-            >
+            <button className="secondary-button" style={{ flex: 1 }} onClick={() => window.location.reload()}>
               Back to Menu
             </button>
           </div>

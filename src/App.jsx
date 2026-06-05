@@ -68,7 +68,7 @@ export default function App() {
   return (
     <div className="container">
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <h1 className="title" style={{ fontSize: '3rem', margin: '0 0 5px 0' }}>Rochambeaudle</h1>
+        <h1 className="title" style={{ fontSize: '3rem', margin: '0 0 5px 0' }}>RochamDle</h1>
         <p style={{ color: 'var(--label-text)', margin: 0 }}>The Daily Global Challenge</p>
       </div>
       
@@ -103,7 +103,7 @@ export default function App() {
             className="secondary-button" 
             onClick={() => setShowMultiplayer(true)}
           >
-            Play with Friends 🤝
+            Play with Friends
           </button>
         ) : (
           <div className="section" style={{ animation: 'fadeIn 0.3s ease' }}>
