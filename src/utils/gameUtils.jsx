@@ -1,4 +1,4 @@
-import React from 'react';
+//import React from 'react';
 
 export const getEmoji = (choice) => {
   const map = { rock: '🪨', paper: '📄', scissors: '✂️', timeout: '⏳' };
@@ -90,4 +90,30 @@ export const getDailySequence = () => {
     sequence.push(moves[Math.floor(seededRandom() * moves.length)]);
   }
   return sequence;
+};
+
+// --- ANIMATION HELPER ---
+export const renderAnimatedChoice = (phase, revealTime, choice, isOpponent) => {
+  // 1. The Countdown Phase
+  if (phase === 'reveal') {
+    if (revealTime === 3) return <div key="3" className="anim-pump">🪨</div>;
+    if (revealTime === 2) return <div key="2" className="anim-pump">📄</div>;
+    if (revealTime === 1) return <div key="1" className="anim-pump">✂️</div>;
+    
+    // Renders a hidden emoji on "Shoot!" (revealTime === 0) so the screen 
+    // goes blank for a millisecond before the explosive reveal!
+    return <div key="0" style={{ visibility: 'hidden' }}>🪨</div>; 
+  }
+
+  // 2. The Explosive Final Reveal Phase
+  if (phase === 'result' || phase === 'gameover') {
+    return <div key="result" className="anim-reveal">{getEmoji(choice)}</div>;
+  }
+
+  // 3. The Waiting / Picking Phase
+  if (isOpponent) {
+    return choice ? '🔒' : '❔';
+  } else {
+    return choice ? getEmoji(choice) : '❔'; 
+  }
 };

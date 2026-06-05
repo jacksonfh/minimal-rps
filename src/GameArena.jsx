@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from './utils/supabaseClient';
-import { getEmoji, getRevealText, renderTimeline, renderHistoryTrail } from './utils/gameUtils';
+import { getRevealText, renderTimeline, renderHistoryTrail, renderAnimatedChoice } from './utils/gameUtils';
 
 export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
   const [phase, setPhase] = useState('waiting'); 
@@ -406,7 +406,7 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
 
           <div className="choice-container">
              <span className="choice-emoji">
-               {(phase === 'result' || phase === 'gameover') ? getEmoji(opponentChoice) : (opponentChoice ? '🔒' : '❔')}
+               {renderAnimatedChoice(phase, revealTime, opponentChoice, true)}
              </span>
           </div>
 
@@ -459,7 +459,7 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
                 <button className="play-button" onClick={() => handleChoice('scissors')}>✂️</button>
               </>
             ) : (
-              <span className="choice-emoji">{myChoice ? getEmoji(myChoice) : ''}</span>
+              <span className="choice-emoji">{renderAnimatedChoice(phase, revealTime, myChoice, false)}</span>
             )}
           </div>
           

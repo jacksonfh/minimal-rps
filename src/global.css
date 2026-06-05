@@ -22,7 +22,7 @@ html {
     padding: 0;
     background-color: var(--main-bg);
     font-family: 'Inter', sans-serif;
-    overscroll-behavior: none; 
+    overscroll-behavior: none;
     overflow: hidden;
     width: 100%;
     height: 100dvh;
@@ -50,7 +50,8 @@ html {
     box-sizing: border-box;
 }
 
-.input, .select {
+.input,
+.select {
     background-color: var(--input-bg);
     color: var(--main-text);
     border: 1px solid var(--input-border);
@@ -73,7 +74,11 @@ html {
     color: var(--label-text);
 }
 
-.primary-button, .secondary-button, .rematch-button, .share-button, .leave-button {
+.primary-button,
+.secondary-button,
+.rematch-button,
+.share-button,
+.leave-button {
     border: none;
     padding: 14px;
     border-radius: 6px;
@@ -85,17 +90,42 @@ html {
     box-sizing: border-box;
 }
 
-.rematch-button { background-color: var(--win); color: var(--main-text); }
-.share-button { background-color: var(--accent2); color: var(--main-text); }
-.primary-button { background-color: var(--accent); color: var(--main-text); }
-.secondary-button { background-color: var(--button-bg); color: var(--main-text); }
-.leave-button { background-color: var(--loss); color: var(--main-text); }
+.rematch-button {
+    background-color: var(--win);
+    color: var(--main-text);
+}
 
-.primary-button:active, .secondary-button:active, .rematch-button:active, .share-button:active, .leave-button:active {
+.share-button {
+    background-color: var(--accent2);
+    color: var(--main-text);
+}
+
+.primary-button {
+    background-color: var(--accent);
+    color: var(--main-text);
+}
+
+.secondary-button {
+    background-color: var(--button-bg);
+    color: var(--main-text);
+}
+
+.leave-button {
+    background-color: var(--loss);
+    color: var(--main-text);
+}
+
+.primary-button:active,
+.secondary-button:active,
+.rematch-button:active,
+.share-button:active,
+.leave-button:active {
     transform: scale(0.95);
 }
 
-.primary-button:disabled, .secondary-button:disabled, .rematch-button:disabled {
+.primary-button:disabled,
+.secondary-button:disabled,
+.rematch-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
@@ -143,15 +173,17 @@ html {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between; 
+    justify-content: space-between;
     width: 100%;
     position: relative;
 }
 
 .center-area {
     width: 100%;
-    height: 110px; /* RIGID HEIGHT: Prevents shifting */
-    border-top: 2px solid var(--input-border); /* Central dividing lines */
+    height: 110px;
+    /* RIGID HEIGHT: Prevents shifting */
+    border-top: 2px solid var(--input-border);
+    /* Central dividing lines */
     border-bottom: 2px solid var(--input-border);
     margin: 10px 0;
     display: flex;
@@ -162,7 +194,8 @@ html {
 }
 
 .center-text-wrapper {
-    height: 45px; /* RIGID HEIGHT: Prevents text swapping from resizing center */
+    height: 45px;
+    /* RIGID HEIGHT: Prevents text swapping from resizing center */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -180,7 +213,8 @@ html {
 }
 
 .choice-container {
-    flex: 1; /* SPRING: Pushes info to edges, keeps emojis centered */
+    flex: 1;
+    /* SPRING: Pushes info to edges, keeps emojis centered */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -189,7 +223,8 @@ html {
 }
 
 .status-text {
-    height: 24px; /* RIGID HEIGHT: Keeps spacing identical when text disappears */
+    height: 24px;
+    /* RIGID HEIGHT: Keeps spacing identical when text disappears */
     margin: 0;
     color: var(--label-text);
     display: flex;
@@ -209,7 +244,8 @@ html {
 }
 
 .choice-emoji {
-    font-size: clamp(4rem, 8vh, 6.5rem); /* Massive feature emojis */
+    font-size: clamp(4rem, 8vh, 6.5rem);
+    /* Massive feature emojis */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -269,7 +305,8 @@ html {
 
 .history-top {
     position: absolute;
-    bottom: 5px; /* Pinned directly above the center dividing line */
+    bottom: 5px;
+    /* Pinned directly above the center dividing line */
     width: 100%;
     display: flex;
     justify-content: center;
@@ -277,7 +314,8 @@ html {
 
 .history-bottom {
     position: absolute;
-    top: 5px; /* Pinned directly below the center dividing line */
+    top: 5px;
+    /* Pinned directly below the center dividing line */
     width: 100%;
     display: flex;
     justify-content: center;
@@ -310,7 +348,9 @@ html {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .rematch-notification {
@@ -353,6 +393,58 @@ html {
     text-align: left;
 }
 
-.menu-dropdown button.disabled-link { opacity: 0.5; }
-.menu-dropdown button.leave-match { background-color: var(--loss); border-radius: 4px; font-weight: bold; }
-.header-controls { display: flex; align-items: center; gap: 10px; }
+.menu-dropdown button.disabled-link {
+    opacity: 0.5;
+}
+
+.menu-dropdown button.leave-match {
+    background-color: var(--loss);
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+@keyframes fist-pump {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+
+    /* Just a clean, subtle pop in size */
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes pop-reveal {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.3);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.anim-pump {
+    /* 0.7s matches the 700ms timer interval you set for the reveal phase! */
+    animation: fist-pump 0.7s ease-in-out;
+}
+
+.anim-reveal {
+    animation: pop-reveal 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getEmoji, getRevealText, renderTimeline, renderHistoryTrail, getDailySequence } from './utils/gameUtils';
+import { getRevealText, renderTimeline, renderHistoryTrail, getDailySequence, renderAnimatedChoice } from './utils/gameUtils';
 
 export default function DailyArena({ myName }) {
   const format = 5; 
@@ -71,7 +71,10 @@ export default function DailyArena({ myName }) {
         const t = setTimeout(() => setRevealTime(revealTime - 1), 700);
         return () => clearTimeout(t);
       } else {
-        calculateWinner();
+        const asyncTimer = setTimeout(() => {
+          calculateWinner();
+        }, 0);
+        return () => clearTimeout(asyncTimer);
       }
     }
   }, [phase, revealTime, calculateWinner]);
@@ -124,7 +127,7 @@ export default function DailyArena({ myName }) {
 
           <div className="choice-container">
             <span className="choice-emoji">
-              {(phase === 'result' || phase === 'gameover') ? getEmoji(opponentChoice) : (opponentChoice ? '🔒' : '❔')}
+              {renderAnimatedChoice(phase, revealTime, opponentChoice, true)}
             </span>
           </div>
           
@@ -172,7 +175,7 @@ export default function DailyArena({ myName }) {
                 <button className="play-button" onClick={() => handleChoice('scissors')}>✂️</button>
               </>
             ) : (
-              <span className="choice-emoji">{myChoice ? getEmoji(myChoice) : ''}</span>
+              <span className="choice-emoji">{renderAnimatedChoice(phase, revealTime, myChoice, false)}</span>
             )}
           </div>
           
