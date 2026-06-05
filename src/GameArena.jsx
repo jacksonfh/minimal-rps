@@ -388,9 +388,11 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
       <div className="arena">
         {/* TOP: OPPONENT AREA */}
         <div className="player-area">
-          <h2 className="player-text">{opponentName}</h2>
-          <p className="score-text">Score: {opponentScore}</p>
-          
+          <div className="player-block-bottom">
+            <h2 className="player-text">{opponentName}</h2>
+            <p className="score-text">Score: {opponentScore}</p>
+          </div>
+
           <div className="choice-container">
              <span className="choice-emoji">
                {(phase === 'result' || phase === 'gameover') ? getEmoji(opponentChoice) : (opponentChoice ? '🔒' : '❔')}
@@ -449,9 +451,10 @@ export default function GameArena({ roomCode, myName, initialFormat, isHost }) {
               <span className="choice-emoji">{myChoice ? getEmoji(myChoice) : ''}</span>
             )}
           </div>
-
-          <p className="score-text">Score: {myScore}</p>
-          <h2 className="player-text">{myName} (You)</h2>
+          <div className="player-block-bottom">
+            <p className="score-text">Score: {myScore}</p>
+            <h2 className="player-text">{myName} (You)</h2>
+          </div>
         </div>
       </div>
 

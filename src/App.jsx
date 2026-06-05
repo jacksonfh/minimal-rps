@@ -85,8 +85,7 @@ export default function App() {
 
         {/* MASSIVE DAILY BUTTON */}
         <button 
-          className="primary-button" 
-          style={{ backgroundColor: 'var(--win)', padding: '16px', fontSize: '1.2rem', marginBottom: '10px' }}
+          className="rematch-button" 
           onClick={() => {
             if (!playerName.trim()) return alert("Please enter a name first!");
             setInDaily(true);

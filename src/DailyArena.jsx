@@ -116,9 +116,11 @@ export default function DailyArena({ myName }) {
       <div className="arena">
         {/* TOP: GLOBAL OPPONENT */}
         <div className="player-area">
-          <h2 className="player-text">The Globe 🌍</h2>
-          <p className="score-text">Score: {opponentScore}</p>
-          
+          <div className="player-block-top">
+            <h2 className="player-text">RPSdle:</h2>
+            <p className="score-text">Score: {opponentScore}</p>
+          </div>
+
           <div className="choice-container">
             <span className="choice-emoji">
               {(phase === 'result' || phase === 'gameover') ? getEmoji(opponentChoice) : (opponentChoice ? '🔒' : '❔')}
@@ -172,19 +174,20 @@ export default function DailyArena({ myName }) {
               <span className="choice-emoji">{myChoice ? getEmoji(myChoice) : ''}</span>
             )}
           </div>
-
-          <p className="score-text">Score: {myScore}</p>
-          <h2 className="player-text">{myName} (You)</h2>
+          <div className="player-block-bottom">
+            <p className="score-text">Score: {myScore}</p>
+            <h2 className="player-text">{myName} (You)</h2>
+          </div>
         </div>
       </div>
 
       <div className="controls">
         {phase === 'gameover' && (
           <div style={{ display: 'flex', gap: '15px', width: '100%' }}>
-            <button className="primary-button" style={{ flex: 1 }} onClick={handleShare}>
+            <button className="share-button" style={{ flex: 1 }} onClick={handleShare}>
               Share Results
             </button>
-            <button className="secondary-button" style={{ flex: 1 }} onClick={() => window.location.reload()}>
+            <button className="leave-button" style={{ flex: 1 }} onClick={() => window.location.reload()}>
               Back to Menu
             </button>
           </div>

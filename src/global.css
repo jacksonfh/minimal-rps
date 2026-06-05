@@ -11,7 +11,7 @@
     --input-border: #333;
     --label-text: #aaa;
     --code-text: #666;
-    --button-bg: #9d4edd;
+    --button-bg: #e22b83;
     --arena-bg: #1a1a1a;
     --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
@@ -73,7 +73,7 @@ html {
     color: var(--label-text);
 }
 
-.primary-button, .secondary-button, .rematch-button , .share-button{
+.primary-button, .secondary-button, .rematch-button , .share-button, .leave-button{
     border: none;
     padding: 14px;
     border-radius: 6px;
@@ -101,6 +101,11 @@ html {
 }
 
 .secondary-button {
+    background-color: var(--button-bg);
+    color: var(--main-text);
+}
+
+.leave-button{
     background-color: var(--loss);
     color: var(--main-text);
 }
@@ -143,7 +148,7 @@ html {
     align-items: center;
     background-color: var(--arena-bg);
     border-radius: 12px;
-    padding: clamp(15px, 3vh, 30px) 20px;
+    padding: clamp(5px, 1dvh, 5px) 5px;
     width: 100%;
     max-width: 600px;
     max-height: 80dvh;
@@ -162,12 +167,20 @@ html {
     position: relative;
 }
 
+.player-block-top{
+    margin-bottom: 5dvh;
+}
+
+.player-block-bottom{
+    margin-top: 5dvh;
+}
+
 .center-area {
     width: 100%;
     height: 110px; /* Locked height prevents shifting */
     border-top: 1px solid var(--input-border);
     border-bottom: 1px solid var(--input-border);
-    margin: 10px 0;
+    margin: 5px 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -184,7 +197,7 @@ html {
 }
 
 .choice-container {
-    height: clamp(60px, 10vh, 90px); /* Locked height for buttons/emojis */
+    height: clamp(90px, 15dvh, 120px); /* Locked height for buttons/emojis */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -213,7 +226,7 @@ html {
 }
 
 .choice-emoji {
-    font-size: clamp(3rem, 6vh, 4.5rem);
+    font-size: clamp(5rem, 12dvh, 7.5rem);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -273,12 +286,12 @@ html {
 
 .history-top {
     position: absolute;
-    bottom: 5px; /* Pinned to the center line */
+    bottom: 0px; /* Pinned to the center line */
 }
 
 .history-bottom {
     position: absolute;
-    top: 5px; /* Pinned to the center line */
+    top: 0px; /* Pinned to the center line */
 }
 
 /* --- Utilities --- */
